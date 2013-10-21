@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+
+OPTIONS="Y N"
+
+SCANDEV=
+MNTROOT=/mnt/clamit
+LOGFILE=$MNTROOT/clam.log
+
+function printhelp {
+    echo "usage: clamit {get [apt | pac], fresh, scan [device | tree]}, clean [logfile]" 
+    exit 1
+}
+
+function get_clamav_pacman {
+    sudo pacman -Syy
+    sudo pacman -S clamav
+
+    echo "Update /etc/pacman.conf and retry ClamAV install? [Y/N]"
+
+    select opt in $OPTIONS; do
+	if [ "$opt" = "Y" ]; then
+	    sudo mv /etc/pacman.conf.pacnew /etc/pacman.conf
+	    get_clamav_pacman
+	fi
+    done
+
+    echo "Update /etc/clamav/freshclam.conf and /etc/clamav/clamd.conf? [Y/N]"
+
+    select opt in $OPTIONS; do
+	if [ "$opt" = "Y" ]; then
+	    sudo sed -i.bak "s/Example//g" /etc/clamav/freshclam.conf
+	    sudo sed -i.bak "s/Example//g" /etc/clamav/clamd.conf
+	fi
+    done
+}
+
+function get_clamav_apt {
+    sudo apt-get update
+    sudo apt-get install clamav
+}
+
+function mountdev {
+
+    # make sure /mnt/clamit/ptX exist...
+    if [ ! -d $MNTROOT ]; then
+	sudo mkdir $MNTROOT
+	for x in 1 2 3 4; do
+	    sudo mkdir ${MNTROOT}/pt${x}
+	done
+    fi
+
+    # let user choose the SCSI device from /dev/ ...
+    devary=
+    x=0
+    for d in /dev/sd?; do
+	echo "${x}) $d"
+	devary[x]=$d
+	let x=x+1
+    done
+    let x=x-1
+    printf "Choose a device to scan [0-${x}]: "
+    read choice
+
+    SCANDEV=${devary[${choice}]}
+
+    # mount each partition of the chosen device in /mnt/clamit/ptX
+    x=1
+    for p in ${SCANDEV}[1-4]; do
+	echo "Mounting $p in ${MNTROOT}/pt${x} ..."
+	sudo mount -w $p ${MNTROOT}/pt${x} 
+	let x=x+1
+    done
+}
+
+function scan {
+    target=
+    if [ -z $1 ]; then
+	mountdev
+	target=$MNTROOT
+    else
+	target=$1
+    fi
+
+    printf "\nScanning $target for viruses ...\n"
+
+    sudo clamscan -r -i -l ${LOGFILE} $target
+}
+
+function clean {
+    logf=
+    if [ -z $1 ]; then
+	logf=$LOGFILE
+    else
+	logf=$1
+    fi
+
+    sudo ./clamit.py $LOGFILE
+}
+
+
+#### 'main' function ####
+
+if [ -z $1 ]; then
+    cmd="-h"
+fi
+
+case $1 in
+    -h|--help)
+	printhelp
+	;;
+    get)
+	[ "$2" = "apt" ] && get_clamav_apt || get_clamav_pacman
+	;;
+    fresh)
+	sudo freshclam
+	;;
+    scan)
+	scan $2
+	;;
+    clean)
+	clean $2
+	;;
+    *)
+	printhelp
+	;;
+esac
+
