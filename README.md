@@ -13,7 +13,7 @@ Install 'git', clone 'clamit' from GitHub, and make the shell script executable:
 
     $ git clone https://github.com/joseph8th/clamit
     $ cd clamit
-    $ chmod 0755 clamit
+    $ sudo chmod 0755 clamit
     
 You can use ClamIt to install ClamAV if you use either `aptitude` (Debian, Ubuntu, etc.), or `pacman` (Arch)
 package managers, as follows (otherwise install `clamav` using your package manager or from source):
