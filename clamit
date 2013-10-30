@@ -5,6 +5,9 @@ OPTIONS="Y N"
 SCANDEV=
 MNTROOT=/mnt/clamit
 LOGFILE=$MNTROOT/clam.log
+CLAMHOME=$HOME/clamit
+
+echo $CLAMHOME
 
 function printhelp {
     echo "usage: clamit {get [apt | pac], fresh, scan [device | tree]}, clean [logfile]" 
@@ -94,7 +97,7 @@ function clean {
 	logf=$1
     fi
 
-    sudo ./clamit.py $LOGFILE
+    sudo $CLAMHOME/clamit.py $LOGFILE
 }
 
 
