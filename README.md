@@ -53,8 +53,8 @@ drive, this will always be `/dev/sda`. If it has two, the second one will be `/d
 card readers, these will be listed also, so some machines may have a lot of devices.
 
 (If you doubt which device to scan, you can quit the program at any time by typing `^-C`. Then run the `lsblk` command
-to get a tree view of all block devices connected to the machine, as well as all their partitions with sizes, filesystem
-types, and even mountpoints. This is enough info to determine which is the correct device to choose.)
+to get a tree view of all block devices connected to the machine. This is enough info to determine which is the correct 
+device to choose.)
 
 ClamIt will then mount all primary partitions of the chosen device in a single tree under `/mnt/clamit` and recursively
 scan the data for viruses *including all Windows system files*. It tells ClamAV to store a log file containing the 
