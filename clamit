@@ -10,7 +10,7 @@ CLAMHOME=$HOME/clamit
 echo $CLAMHOME
 
 function printhelp {
-    echo "usage: clamit {get [apt | pac], fresh, scan [device | tree]}, clean [logfile]" 
+    echo "usage: clamit {get [apt | pac], fresh, mount, scan [device | tree]}, clean [logfile]" 
     exit 1
 }
 
@@ -116,6 +116,9 @@ case $1 in
 	;;
     fresh)
 	sudo freshclam
+	;;
+    mount)
+	mountdev
 	;;
     scan)
 	scan $2
