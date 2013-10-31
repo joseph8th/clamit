@@ -84,6 +84,10 @@ function scan {
 	target=$1
     fi
 
+    if [ -f $LOGFILE ]; then
+	sudo rm $LOGFILE
+    fi
+
     printf "\nScanning $target for viruses ...\n"
 
     sudo clamscan -r -i -l ${LOGFILE} $target
