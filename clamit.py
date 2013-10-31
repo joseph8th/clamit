@@ -51,7 +51,8 @@ else:
     q_path = os.path.join(os.getcwd(), 'clam-quarantine')
 
 # process the clamscan log file ...
-print "Processing clamscan log file ...\n  --> " + f_path
+print "Processing clamscan log file '%s' ..." % (f_path)
+print "  --> Quarantine path: '%s'\n" % (q_path)
 
 try:
     f = open(f_path, 'r')
