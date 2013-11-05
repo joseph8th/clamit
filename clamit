@@ -7,12 +7,16 @@ MNTROOT=/mnt/clamit
 LOGFILE=$MNTROOT/clam.log
 CLAMHOME=$HOME/clamit
 
-echo $CLAMHOME
 
 function printhelp {
-    echo "usage: clamit {get [apt | pac], fresh, mount, scan [device | tree]}, clean [logfile]" 
+    printf "usage: clamit { get [git | apt | pac], 
+                fresh, 
+                mount, 
+                scan [device | tree], 
+                clean [logfile] }\n\n" 
     exit 1
 }
+
 
 function get_clamav_pacman {
     sudo pacman -Syy
@@ -37,10 +41,17 @@ function get_clamav_pacman {
     done
 }
 
+
 function get_clamav_apt {
     sudo apt-get update
     sudo apt-get install clamav
 }
+
+
+function get_clamit_git {
+    git pull
+}
+
 
 function mountdev {
 
@@ -75,7 +86,10 @@ function mountdev {
     done
 }
 
+
 function scan {
+    # choose a device to mount and clamscan
+
     target=
     if [ -z $1 ]; then
 	mountdev
@@ -93,7 +107,10 @@ function scan {
     sudo clamscan -r -i -l ${LOGFILE} $target
 }
 
+
 function clean {
+    # process the clamscan log file
+
     logf=
     if [ -z $1 ]; then
 	logf=$LOGFILE
@@ -105,33 +122,48 @@ function clean {
 }
 
 
-#### 'main' function ####
+function _main {
+    #### 'main' function ####
 
-if [ -z $1 ]; then
-    cmd="-h"
-fi
+    if [ -z $1 ]; then
+	cmd="-h"
+    fi
 
-case $1 in
-    -h|--help)
-	printhelp
-	;;
-    get)
-	[ "$2" = "apt" ] && get_clamav_apt || get_clamav_pacman
-	;;
-    fresh)
-	sudo freshclam
-	;;
-    mount)
-	mountdev
-	;;
-    scan)
-	scan $2
-	;;
-    clean)
-	clean $2
-	;;
-    *)
-	printhelp
-	;;
-esac
+    case $1 in
+	-h|--help)
+	    printhelp
+	    ;;
+	get)
+	    case $2 in
+		apt)
+		    get_clamav_apt
+		    ;;
+		pac)
+		    get_clamav_pacman
+		    ;;
+		*)
+		    get_clamit_git
+		    ;;
+	    esac
+	    ;;
+	fresh)
+	    sudo freshclam
+	    ;;
+	mount)
+	    mountdev
+	    ;;
+	scan)
+	    scan $2
+	    ;;
+	clean)
+	    clean $2
+	    ;;
+	*)
+	    printhelp
+	    ;;
+    esac
+}
 
+_main $@
+
+exit
