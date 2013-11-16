@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ClamIt Clean
+Comment=Process the log file from clamscan
+Exec=/home/cst/clamit/launchit.sh "clamit clean"
+Icon=editclear
+Path=/home/cst/clamit
+Terminal=true
+StartupNotify=false

@@ -1,45 +1,46 @@
 #!/usr/bin/env bash
 
-OPTIONS="Y N"
+source clamitrc
 
+
+OPTIONS="y N"
 SCANDEV=
-MNTROOT=/mnt/clamit
-LOGFILE=$MNTROOT/clam.log
-CLAMHOME=$HOME/clamit
 
 
 function printhelp {
-    printf "usage: clamit { get [git | apt | pac], 
-                fresh, 
-                mount, 
-                scan [device | tree], 
-                clean [logfile] }\n\n" 
+    printf "usage: clamit { 
+                install {clam [-a | -p], cmd, launch, update}
+                fresh
+                mount
+                scan [device | tree]
+                clean [logfile] 
+}\n\n" 
     exit 1
 }
+
 
 
 function get_clamav_pacman {
     sudo pacman -Syy
     sudo pacman -S clamav
 
-    echo "Update /etc/pacman.conf and retry ClamAV install? [Y/N]"
-
+    echo "Update /etc/pacman.conf and retry ClamAV install? [y/N]"
     select opt in $OPTIONS; do
-	if [ "$opt" = "Y" ]; then
+	if [ "$opt" = "y" ]; then
 	    sudo mv /etc/pacman.conf.pacnew /etc/pacman.conf
 	    get_clamav_pacman
 	fi
     done
 
-    echo "Update /etc/clamav/freshclam.conf and /etc/clamav/clamd.conf? [Y/N]"
-
+    echo "Update /etc/clamav/freshclam.conf and /etc/clamav/clamd.conf? [y/N]"
     select opt in $OPTIONS; do
-	if [ "$opt" = "Y" ]; then
+	if [ "$opt" = "y" ]; then
 	    sudo sed -i.bak "s/Example//g" /etc/clamav/freshclam.conf
 	    sudo sed -i.bak "s/Example//g" /etc/clamav/clamd.conf
 	fi
     done
 }
+
 
 
 function get_clamav_apt {
@@ -48,9 +49,43 @@ function get_clamav_apt {
 }
 
 
-function get_clamit_git {
+
+function install_clamit_cmd {
+    [[ ! -f "$CLAMIT_CMD" ]] && sudo ln -s ${CLAMIT_ROOT}/clamit $CLAMIT_CMD
+}
+
+
+
+function install_launchers {
+    [[ ! -d "$CLAMIT_SKEL" ]] && echo "'skel' launchers not found" && exit 1
+
+    # found the 'skel' dir now append appz to launch using env vars
+    echo "Exec=${CLAMIT_ROOT}/launchit.sh lsblk" \
+	>> ${CLAMIT_SKEL}/List-Drives.desktop
+    echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/List-Drives.desktop
+
+    echo "Exec=${CLAMIT_ROOT}/launchit.sh \"clamit fresh\"" \
+	>> ${CLAMIT_SKEL}/ClamIt-Fresh.desktop
+    echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/ClamIt-Fresh.desktop
+
+    echo "Exec=${CLAMIT_ROOT}/launchit.sh \"clamit scan\"" \
+	>> ${CLAMIT_SKEL}/ClamIt-Scan.desktop
+    echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/ClamIt-Scan.desktop
+
+    echo "Exec=${CLAMIT_ROOT}/launchit.sh \"clamit clean\"" \
+	>> ${CLAMIT_SKEL}/ClamIt-Clean.desktop
+    echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/ClamIt-Clean.desktop
+
+    cp ${CLAMIT_SKEL}/*.desktop ${HOME}/Desktop
+
+    cp ${CLAMIT_ROOT}/clamitrc ${HOME}/.config
+}
+
+
+function update_clamit {
     git pull
 }
+
 
 
 function mountdev {
@@ -98,19 +133,15 @@ function scan {
 	target=$1
     fi
 
-    if [ -f $LOGFILE ]; then
-	sudo rm $LOGFILE
-    fi
+    [ -f $LOGFILE ] && sudo rm $LOGFILE
 
     printf "\nScanning $target for viruses ...\n"
-
     sudo clamscan -r -i -l ${LOGFILE} $target
 }
 
 
+# process the clamscan log file
 function clean {
-    # process the clamscan log file
-
     logf=
     if [ -z $1 ]; then
 	logf=$LOGFILE
@@ -118,31 +149,41 @@ function clean {
 	logf=$1
     fi
 
-    sudo $CLAMHOME/clamit.py $LOGFILE
+    sudo $CLAMIT_ROOT/src/clamit.py $LOGFILE
 }
 
 
+#### 'main' function ####
 function _main {
-    #### 'main' function ####
 
     if [ -z $1 ]; then
 	cmd="-h"
     fi
 
     case $1 in
-	-h|--help)
-	    printhelp
-	    ;;
-	get)
+	install)
 	    case $2 in
-		apt)
-		    get_clamav_apt
+		clam)
+		    case $3 in
+			-p)
+			    get_clamav_pacman
+			    ;;
+			*)
+			    get_clamav_apt
+			    ;;
+		    esac
 		    ;;
-		pac)
-		    get_clamav_pacman
+		cmd)
+		    install_clamit_cmd
+		    ;;
+		launch)
+		    install_launchers
+		    ;;
+		update)
+		    update_clamit
 		    ;;
 		*)
-		    get_clamit_git
+		    print_help
 		    ;;
 	    esac
 	    ;;

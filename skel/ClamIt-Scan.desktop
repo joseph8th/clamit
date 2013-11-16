@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ClamIt-Scan
+Comment=Scan all partitions of chosen disk for viruses.
+Icon=gtk-find
+Terminal=true
+StartupNotify=false
+Exec=/launchit.sh "clamit scan"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit scan"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit scan"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit scan"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit scan"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit scan"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit scan"
+Path=/home/cst/clamit

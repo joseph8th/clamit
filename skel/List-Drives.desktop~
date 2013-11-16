@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=List Drives
+Comment=Show all devices and partitions
+Exec=
+Icon=emblem-system
+Path=
+Terminal=true
+StartupNotify=false

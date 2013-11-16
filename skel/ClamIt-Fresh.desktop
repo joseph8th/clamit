@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ClamIt-Fresh
+Comment=Update virus databases
+Icon=software-update-available
+Terminal=true
+StartupNotify=false
+Exec=/launchit.sh "clamit fresh"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit fresh"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit fresh"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit fresh"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit fresh"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit fresh"
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh "clamit fresh"
+Path=/home/cst/clamit

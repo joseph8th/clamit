@@ -1,0 +1,22 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=List-Drives
+Comment=Show all devices and partitions
+Icon=emblem-system
+Terminal=true
+StartupNotify=false
+Exec=/launchit.sh lsblk
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh lsblk
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh lsblk
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh lsblk
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh lsblk
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh lsblk
+Path=/home/cst/clamit
+Exec=/home/cst/clamit/launchit.sh lsblk
+Path=/home/cst/clamit

@@ -1,0 +1,17 @@
+
+function _get_clamit_root {
+    [ ! -e "${HOME}/.clamit" ] && CLAMIT_ROOT=$(pwd) || CLAMIT_ROOT=${HOME}/.clamit
+
+}
+
+_get_clamit_root
+
+CLAMIT_CMD=/usr/local/bin/clamit
+CLAMIT_TMP=${CLAMIT_ROOT}/tmp
+CLAMIT_SKEL=${CLAMIT_ROOT}/skel
+
+MNTROOT=/mnt/clamit
+LOGFILE=${CLAMIT_TMP}/clam.log
+
+GTERM_CONF=gnome-terminal-conf.xml
+GTERM_CONF_BAK=${CLAMIT_TMP}/${GTERM_CONF}
