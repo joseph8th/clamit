@@ -153,8 +153,6 @@ function scan {
 
     printf "\nScanning $target for viruses ...\n"
     sudo clamscan -r -i -l ${LOGFILE} $target
-
-    umountdev
 }
 
 
@@ -167,7 +165,8 @@ function clean {
 	logf=$1
     fi
 
-    sudo $CLAMIT_ROOT/src/clamit.py $LOGFILE
+    sudo $CLAMIT_ROOT/clamit.py $LOGFILE
+    umountdev
 }
 
 
