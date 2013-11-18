@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
 
-source clamitrc
+source $HOME/.clamit/clamitrc
 
 
 OPTIONS="y N"
 SCANDEV=
-
+MNTPTS=0
 
 function printhelp {
     printf "usage: clamit { 
                 install {clam [-a | -p], cmd, launch, update}
                 fresh
-                mount
+                mount [-u]
                 scan [device | tree]
                 clean [logfile] 
 }\n\n" 
     exit 1
+}
+
+
+
+function check_clamit {
+    [ ! -e "$CLAMIT_TMP" ] && mkdir $CLAMIT_TMP
 }
 
 
@@ -113,11 +119,21 @@ function mountdev {
     SCANDEV=${devary[${choice}]}
 
     # mount each partition of the chosen device in /mnt/clamit/ptX
-    x=1
+    MNTPTS=0
     for p in ${SCANDEV}[1-4]; do
-	echo "Mounting $p in ${MNTROOT}/pt${x} ..."
-	sudo mount -w $p ${MNTROOT}/pt${x} 
-	let x=x+1
+	let MNTPTS=MNTPTS+1
+	echo "Mounting $p in ${MNTROOT}/pt${MNTPTS} ..."
+	sudo mount -w $p ${MNTROOT}/pt${MNTPTS} 
+    done
+}
+
+
+function umountdev {
+    MNTPTS=4
+    echo "Unmounting $MNTPTS mount points ..."
+    while [ $MNTPTS -gt 0 ]; do
+	sudo umount ${MNTROOT}/pt${MNTPTS}
+	let MNTPTS=$MNTPTS-1
     done
 }
 
@@ -137,6 +153,8 @@ function scan {
 
     printf "\nScanning $target for viruses ...\n"
     sudo clamscan -r -i -l ${LOGFILE} $target
+
+    umountdev
 }
 
 
@@ -159,6 +177,8 @@ function _main {
     if [ -z $1 ]; then
 	cmd="-h"
     fi
+
+    check_clamit
 
     case $1 in
 	install)
@@ -191,8 +211,16 @@ function _main {
 	    sudo freshclam
 	    ;;
 	mount)
-	    mountdev
+	    case $2 in
+		-u)
+		    umountdev
+		    ;;
+		*)
+		    mountdev
+		    ;;
+	    esac
 	    ;;
+
 	scan)
 	    scan $2
 	    ;;
