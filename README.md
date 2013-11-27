@@ -1,26 +1,40 @@
 ClamIt
 ======
 
-Simple commandline utility script to make [ClamAV](http://clamav.net) antivirus software for Linux-based mailservers easier to use
-from a LiveCD or USB drive. Intended for Windows OS virus removal.
+Simple commandline utility script to make the industrial-strength [ClamAV](http://clamav.net) antivirus software for mailservers easier to use from a Linux LiveCD or USB drive. Intended for Windows OS virus removal.
 
-Installation
-------------
+Basic Installation
+------------------
 
-Boot the target computer to a Linux LiveCD (or better yet, Ubuntu-based persisent USB). 
+1) Boot the target computer to a Linux LiveCD (or better yet, Ubuntu-based persisent USB). 
 
-Install `git`, clone `clamit` from GitHub, and make the shell script executable:
+2) Install `git`, clone `clamit` from GitHub *into a hidden `~/.clamit` directory*:
 
-    $ git clone https://github.com/joseph8th/clamit
+    $ git clone https://github.com/joseph8th/clamit ~/.clamit
     
-You can use ClamIt to install ClamAV if you use either `aptitude` (Debian, Ubuntu, etc.), or `pacman` (Arch)
-package managers, as follows (otherwise install `clamav` using your package manager or from source):
+3) Make the shell script executable:
 
-    $ ./clamit get [apt | pac]
+    $ cd ~/.clamit; chmod +x clamit
 
-You can update ClamIt by using the default `get git` option:
+4) Install the `clamit` command into your `PATH` (so you don't have to be in the `~/.clamit` directory to run it):
 
-    $ ./clamit get
+    $ ./clamit install cmd
+
+5) You can use `clamit` to install `clamav` if you use either the `aptitude` (Debian, Ubuntu, etc.) or `pacman` (Arch)
+package managers (otherwise install `clamav` using your package manager, or from source):
+
+    $ clamit install clam [-a | -p]
+
+Advanced Installation
+---------------------
+
+* Update `clamit` from the repository using:
+
+    $ clamit install update
+    
+* Install four useful `*.desktop` launchers to the current user's `Desktop` folder, if it exists. NOTE: this feature requires `gnome-terminal` to work, for now.
+
+    $ clamit install launch
     
 Usage
 -----
