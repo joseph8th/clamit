@@ -18,14 +18,14 @@ Basic Installation
 
     $ cd ~/.clamit; chmod +x clamit
 
-4) Install the `clamit` command into your `PATH` (so you don't have to be in the `~/.clamit` directory to run it):
+4) Install the `clamit` command into your `PATH` (so you don't have to type `~/.clamit/clamit` to run it from another directory):
 
     $ ./clamit install cmd
 
 5) You can use `clamit` to install `clamav` if you use either the `aptitude` (Debian, Ubuntu, etc.) or `pacman` (Arch)
 package managers (otherwise install `clamav` using your package manager, or from source):
 
-    $ clamit install clam [-a | -p]
+    $ clamit install clamav [-a | -p]
 
 Advanced Installation
 ---------------------
