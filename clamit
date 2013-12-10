@@ -9,7 +9,7 @@ MNTPTS=0
 
 function printhelp {
     printf "usage: clamit { 
-                install {clam [-a | -p], cmd, launch, update}
+                install [clamav [-a | -p] | cmd | launch | update]
                 fresh
                 mount [-u]
                 scan [device | tree]
@@ -182,7 +182,7 @@ function _main {
     case $1 in
 	install)
 	    case $2 in
-		clam)
+		clamav)
 		    case $3 in
 			-p)
 			    get_clamav_pacman
