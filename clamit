@@ -93,16 +93,10 @@ function update_clamit {
 }
 
 
-
 function mountdev {
 
-    # make sure /mnt/clamit/ptX exist...
-    if [ ! -d $MNTROOT ]; then
-	sudo mkdir $MNTROOT
-	for x in 1 2 3 4; do
-	    sudo mkdir ${MNTROOT}/pt${x}
-	done
-    fi
+    # make sure /mnt/clamit/ exist...
+    [ ! -d $MNTROOT ] && sudo mkdir $MNTROOT
 
     # let user choose the SCSI device from /dev/ ...
     devary=
@@ -120,20 +114,20 @@ function mountdev {
 
     # mount each partition of the chosen device in /mnt/clamit/ptX
     MNTPTS=0
-    for p in ${SCANDEV}[1-4]; do
+    for p in ${SCANDEV}?; do
 	let MNTPTS=MNTPTS+1
 	echo "Mounting $p in ${MNTROOT}/pt${MNTPTS} ..."
-	sudo mount -w $p ${MNTROOT}/pt${MNTPTS} 
+	# make sure /mnt/clamit/ptX exists...
+	[ ! -d ${MNTROOT}/pt${MNTPTS} ] && sudo mkdir ${MNTROOT}/pt${MNTPTS}
+	sudo mount -w $p ${MNTROOT}/pt${MNTPTS}
     done
 }
 
 
 function umountdev {
-    MNTPTS=4
-    echo "Unmounting $MNTPTS mount points ..."
-    while [ $MNTPTS -gt 0 ]; do
-	sudo umount ${MNTROOT}/pt${MNTPTS}
-	let MNTPTS=$MNTPTS-1
+    echo "Unmounting mount points ..."
+    for p in ${MNTROOT}/*; do
+	sudo umount ${p}
     done
 }
 
