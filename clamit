@@ -1,26 +1,35 @@
 #!/usr/bin/env bash
 
-source $HOME/.clamit/clamitrc
-
-
 OPTIONS="y N"
+DEF_CLAMITRC=$HOME/.clamit/clamitrc
+CLAMITRC=
 SCANDEV=
 MNTPTS=0
 
 function printhelp {
-    printf "usage: clamit { 
+    printf "usage: clamit {
                 install [clamav [-a | -p] | cmd | launch | update]
                 fresh
                 mount [-u]
                 scan [device | tree]
-                clean [logfile] 
-}\n\n" 
+                clean [logfile]
+}\n\n"
     exit 1
 }
 
 
 
 function check_clamit {
+    if [[ -e "$DEF_CLAMITRC" ]]; then
+        CLAMITRC=$DEF_CLAMITRC
+    elif [[ -e "./clamitrc" ]]; then
+        CLAMITRC=./clamitrc
+    else
+        echo "ERROR: clamitrc not found"
+        exit 1
+    fi
+
+    source "$CLAMITRC"
     [ ! -e "$CLAMIT_TMP" ] && mkdir $CLAMIT_TMP
 }
 
@@ -32,18 +41,18 @@ function get_clamav_pacman {
 
     echo "Update /etc/pacman.conf and retry ClamAV install? [y/N]"
     select opt in $OPTIONS; do
-	if [ "$opt" = "y" ]; then
-	    sudo mv /etc/pacman.conf.pacnew /etc/pacman.conf
-	    get_clamav_pacman
-	fi
+    if [ "$opt" = "y" ]; then
+        sudo mv /etc/pacman.conf.pacnew /etc/pacman.conf
+        get_clamav_pacman
+    fi
     done
 
     echo "Update /etc/clamav/freshclam.conf and /etc/clamav/clamd.conf? [y/N]"
     select opt in $OPTIONS; do
-	if [ "$opt" = "y" ]; then
-	    sudo sed -i.bak "s/Example//g" /etc/clamav/freshclam.conf
-	    sudo sed -i.bak "s/Example//g" /etc/clamav/clamd.conf
-	fi
+    if [ "$opt" = "y" ]; then
+        sudo sed -i.bak "s/Example//g" /etc/clamav/freshclam.conf
+        sudo sed -i.bak "s/Example//g" /etc/clamav/clamd.conf
+    fi
     done
 }
 
@@ -67,19 +76,19 @@ function install_launchers {
 
     # found the 'skel' dir now append appz to launch using env vars
     echo "Exec=${CLAMIT_ROOT}/launchit.sh lsblk" \
-	>> ${CLAMIT_SKEL}/List-Drives.desktop
+    >> ${CLAMIT_SKEL}/List-Drives.desktop
     echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/List-Drives.desktop
 
     echo "Exec=${CLAMIT_ROOT}/launchit.sh \"clamit fresh\"" \
-	>> ${CLAMIT_SKEL}/ClamIt-Fresh.desktop
+    >> ${CLAMIT_SKEL}/ClamIt-Fresh.desktop
     echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/ClamIt-Fresh.desktop
 
     echo "Exec=${CLAMIT_ROOT}/launchit.sh \"clamit scan\"" \
-	>> ${CLAMIT_SKEL}/ClamIt-Scan.desktop
+    >> ${CLAMIT_SKEL}/ClamIt-Scan.desktop
     echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/ClamIt-Scan.desktop
 
     echo "Exec=${CLAMIT_ROOT}/launchit.sh \"clamit clean\"" \
-	>> ${CLAMIT_SKEL}/ClamIt-Clean.desktop
+    >> ${CLAMIT_SKEL}/ClamIt-Clean.desktop
     echo "Path=${CLAMIT_ROOT}" >> ${CLAMIT_SKEL}/ClamIt-Clean.desktop
 
     cp ${CLAMIT_SKEL}/*.desktop ${HOME}/Desktop
@@ -102,9 +111,9 @@ function mountdev {
     devary=
     x=0
     for d in /dev/sd?; do
-	echo "${x}) $d"
-	devary[x]=$d
-	let x=x+1
+    echo "${x}) $d"
+    devary[x]=$d
+    let x=x+1
     done
     let x=x-1
     printf "Choose a device to scan [0-${x}]: "
@@ -115,11 +124,11 @@ function mountdev {
     # mount each partition of the chosen device in /mnt/clamit/ptX
     MNTPTS=0
     for p in ${SCANDEV}?; do
-	let MNTPTS=MNTPTS+1
-	echo "Mounting $p in ${MNTROOT}/pt${MNTPTS} ..."
-	# make sure /mnt/clamit/ptX exists...
-	[ ! -d ${MNTROOT}/pt${MNTPTS} ] && sudo mkdir ${MNTROOT}/pt${MNTPTS}
-	sudo mount -w $p ${MNTROOT}/pt${MNTPTS}
+    let MNTPTS=MNTPTS+1
+    echo "Mounting $p in ${MNTROOT}/pt${MNTPTS} ..."
+    # make sure /mnt/clamit/ptX exists...
+    [ ! -d ${MNTROOT}/pt${MNTPTS} ] && sudo mkdir ${MNTROOT}/pt${MNTPTS}
+    sudo mount -w $p ${MNTROOT}/pt${MNTPTS}
     done
 }
 
@@ -127,7 +136,7 @@ function mountdev {
 function umountdev {
     echo "Unmounting mount points ..."
     for p in ${MNTROOT}/*; do
-	sudo umount ${p}
+    sudo umount ${p}
     done
 }
 
@@ -137,10 +146,10 @@ function scan {
 
     target=
     if [ -z $1 ]; then
-	mountdev
-	target=$MNTROOT
+    mountdev
+    target=$MNTROOT
     else
-	target=$1
+    target=$1
     fi
 
     [ -f $LOGFILE ] && sudo rm $LOGFILE
@@ -154,9 +163,9 @@ function scan {
 function clean {
     logf=
     if [ -z $1 ]; then
-	logf=$LOGFILE
+    logf=$LOGFILE
     else
-	logf=$1
+    logf=$1
     fi
 
     sudo $CLAMIT_ROOT/clamit.py $LOGFILE
@@ -168,61 +177,61 @@ function clean {
 function _main {
 
     if [ -z $1 ]; then
-	cmd="-h"
+    cmd="-h"
     fi
 
     check_clamit
 
     case $1 in
-	install)
-	    case $2 in
-		clamav)
-		    case $3 in
-			-p)
-			    get_clamav_pacman
-			    ;;
-			*)
-			    get_clamav_apt
-			    ;;
-		    esac
-		    ;;
-		cmd)
-		    install_clamit_cmd
-		    ;;
-		launch)
-		    install_launchers
-		    ;;
-		update)
-		    update_clamit
-		    ;;
-		*)
-		    print_help
-		    ;;
-	    esac
-	    ;;
-	fresh)
-	    sudo freshclam
-	    ;;
-	mount)
-	    case $2 in
-		-u)
-		    umountdev
-		    ;;
-		*)
-		    mountdev
-		    ;;
-	    esac
-	    ;;
+    install)
+        case $2 in
+        clamav)
+            case $3 in
+            -p)
+                get_clamav_pacman
+                ;;
+            *)
+                get_clamav_apt
+                ;;
+            esac
+            ;;
+        cmd)
+            install_clamit_cmd
+            ;;
+        launch)
+            install_launchers
+            ;;
+        update)
+            update_clamit
+            ;;
+        *)
+            print_help
+            ;;
+        esac
+        ;;
+    fresh)
+        sudo freshclam
+        ;;
+    mount)
+        case $2 in
+        -u)
+            umountdev
+            ;;
+        *)
+            mountdev
+            ;;
+        esac
+        ;;
 
-	scan)
-	    scan $2
-	    ;;
-	clean)
-	    clean $2
-	    ;;
-	*)
-	    printhelp
-	    ;;
+    scan)
+        scan $2
+        ;;
+    clean)
+        clean $2
+        ;;
+    *)
+        printhelp
+        ;;
     esac
 }
 
